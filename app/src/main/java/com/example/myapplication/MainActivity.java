@@ -1,17 +1,19 @@
 package com.example.myapplication;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.myapplication.modelo.Produto;
 
 import java.util.ArrayList;
 
@@ -21,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private final int RESULT_CODE_NOVO_PRODUTO = 10;
     private final int REQUEST_CODE_EDITAR_PRODUTO = 2;
     private final int RESULT_CODE_PRODUTO_EDITADO = 11;
+    private final int RESULT_CODE_EXCLUIR_PRODUTO = 8;
+    private final int REQUEST_CODE_EXCLUIR_PRODUTO = 3;
 
     private ListView listViewProdutos;
     private ArrayAdapter<Produto> adapaterProdutos;
@@ -55,13 +59,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    private ArrayList<Produto> criarListaProdutos(){
-//        ArrayList<Produto> produtos = new ArrayList<Produto>();
-//        produtos.add(new Produto("notebook", 3500f));
-//        produtos.add(new Produto("mouse", 40f));
-//        produtos.add(new Produto("roteador", 190.90f));
-//        return produtos;
-//    }
     public void onClickNovoProduto (View v){
         Intent intent = new Intent(MainActivity.this, CadastroProdutoActivity.class);
         startActivityForResult(intent, REQUEST_CODE_NOVO_PRODUTO);
@@ -69,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE_NOVO_PRODUTO && resultCode == RESULT_CODE_NOVO_PRODUTO){
+        if (requestCode == REQUEST_CODE_NOVO_PRODUTO && resultCode == RESULT_CODE_NOVO_PRODUTO) {
             Produto produto = (Produto) data.getExtras().getSerializable("novoProduto");
             produto.setId(++id);
             this.adapaterProdutos.add(produto);
@@ -77,13 +74,16 @@ public class MainActivity extends AppCompatActivity {
             Produto produtoEditado = (Produto) data.getExtras().getSerializable("produtoEditado");
             for (int i = 0; i < adapaterProdutos.getCount(); i++){
                 Produto produto = adapaterProdutos.getItem(i);
-                if (produto.getId() == produtoEditado.getId()){
-                    adapaterProdutos.remove(produto);
+                if (produto.getId() == produtoEditado.getId()) {
                     adapaterProdutos.insert(produtoEditado, i);
-                    break;
                 }
             }
             Toast.makeText(MainActivity.this, "Produto Editado", Toast.LENGTH_LONG).show();
+        }else if (requestCode == REQUEST_CODE_EXCLUIR_PRODUTO && resultCode == RESULT_CODE_EXCLUIR_PRODUTO){
+            Produto produtoParaExcluir = (Produto) data.getExtras().getSerializable("excluirProduto");
+            produtoParaExcluir.setId(--id);
+            this.adapaterProdutos.remove(produtoParaExcluir);
+            finish();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

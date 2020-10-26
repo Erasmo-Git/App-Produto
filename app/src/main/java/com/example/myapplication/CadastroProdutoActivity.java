@@ -7,13 +7,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import com.example.myapplication.modelo.Produto;
-
 public class CadastroProdutoActivity extends AppCompatActivity {
 
     private final int RESULT_CODE_NOVO_PRODUTO = 10;
     private final int RESULT_CODE_PRODUTO_EDITADO = 11;
+    private final int RESULT_CODE_EXCLUIR_PRODUTO = 8;
+
     private boolean edicao = false;
+    private boolean exclusao = true;
     private int id = 0;
 
     @Override
@@ -36,8 +37,9 @@ public class CadastroProdutoActivity extends AppCompatActivity {
             id = produto.getId();
         }
     }
-
-    public void onClickVoltar (View v){ finish(); }
+    public void onClickVoltar (View v){
+        finish();
+    }
     public void onClickSalvar (View v){
         EditText editTextNome = findViewById(R.id.et_nome);
         EditText editTextValor = findViewById(R.id.et_valor);
@@ -45,16 +47,30 @@ public class CadastroProdutoActivity extends AppCompatActivity {
         String nome = editTextNome.getText().toString();
         float valor = Float.parseFloat(editTextValor.getText().toString());
 
-        Produto produto = new Produto(id, nome, valor);
-        Intent intent = new Intent();
-        if(edicao){
+        if(edicao) {
+            Produto produto = new Produto(id, nome, valor);
+            Intent intent = new Intent();
             intent.putExtra("produtoEditado", produto);
-            setResult(RESULT_CODE_PRODUTO_EDITADO);
+            setResult(RESULT_CODE_PRODUTO_EDITADO, intent);
         }else {
+            Produto produto = new Produto(id, nome, valor);
+            Intent intent = new Intent();
             intent.putExtra("novoProduto", produto);
             setResult(RESULT_CODE_NOVO_PRODUTO, intent);
         }
-
         finish();
     }
+
+    public void onClickExcluir(View v) {
+        EditText editTextNome = findViewById(R.id.et_nome);
+        EditText editTextValor = findViewById(R.id.et_valor);
+        String nome = editTextNome.getText().toString();
+        float valor = Float.parseFloat(editTextValor.getText().toString());
+        Produto produtoExcluir = new Produto(id, nome, valor);
+        Intent intent = new Intent();
+        intent.putExtra("excluirProduto", produtoExcluir);
+        setResult(RESULT_CODE_EXCLUIR_PRODUTO, intent);
+        finish();
+    }
+
 }
