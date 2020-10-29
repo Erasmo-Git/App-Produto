@@ -1,20 +1,19 @@
 package com.example.myapplication;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.myapplication.database.ClasseUtilizadaParaManipularTabelaProdutoDAO;
+import com.example.myapplication.modelo.Produto;
 
 public class CadastroProdutoActivity extends AppCompatActivity {
 
-    private final int RESULT_CODE_NOVO_PRODUTO = 10;
-    private final int RESULT_CODE_PRODUTO_EDITADO = 11;
-    private final int RESULT_CODE_EXCLUIR_PRODUTO = 8;
-
-    private boolean edicao = false;
-    private boolean exclusao = true;
+    private final int RESULT_CODE_EXCLUIR_PRODUTO = 16;
     private int id = 0;
 
     @Override
@@ -33,7 +32,6 @@ public class CadastroProdutoActivity extends AppCompatActivity {
             EditText editTextValor = findViewById(R.id.et_valor);
             editTextNome.setText(produto.getNome());
             editTextValor.setText(String.valueOf(produto.getValor()));
-            edicao = true;
             id = produto.getId();
         }
     }
@@ -47,18 +45,14 @@ public class CadastroProdutoActivity extends AppCompatActivity {
         String nome = editTextNome.getText().toString();
         float valor = Float.parseFloat(editTextValor.getText().toString());
 
-        if(edicao) {
-            Produto produto = new Produto(id, nome, valor);
-            Intent intent = new Intent();
-            intent.putExtra("produtoEditado", produto);
-            setResult(RESULT_CODE_PRODUTO_EDITADO, intent);
-        }else {
-            Produto produto = new Produto(id, nome, valor);
-            Intent intent = new Intent();
-            intent.putExtra("novoProduto", produto);
-            setResult(RESULT_CODE_NOVO_PRODUTO, intent);
+        Produto produto = new Produto(id, nome, valor);
+        ClasseUtilizadaParaManipularTabelaProdutoDAO produtoDAO = new ClasseUtilizadaParaManipularTabelaProdutoDAO(getBaseContext()); // getBaseContext: da acesso a classe produtoDAO
+        boolean salvou = produtoDAO.Salvar(produto);
+        if (salvou) {
+            finish();
+        } else {
+            Toast.makeText(CadastroProdutoActivity.this, "Erro ao salvar", Toast.LENGTH_LONG).show();
         }
-        finish();
     }
 
     public void onClickExcluir(View v) {
